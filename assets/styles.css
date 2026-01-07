@@ -708,16 +708,4 @@ div[data-testid="stRadio"] > div[role="radiogroup"]
     width: 100% !important;
   }
 
-  /* 文字：見やすく（入力欄より1段大きめ＋太字） */
-  .result-item .result-value{
-    font-size: 1.1rem !important;
-    font-weight: 800 !important;
-    line-height: 1.2 !important;
-  }
-  .result-item .result-label{
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    line-height: 1.2 !important;
-  }
-
 }
