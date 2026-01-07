@@ -1,0 +1,723 @@
+/* assets/styles.css
+   Ported from the original HTML (退職金・年金受取最適化シミュレーター v4.4)
+   with minimal Streamlit-specific adjustments.
+*/
+:root{
+  --bg1:#667eea;
+  --bg2:#764ba2;
+  --accent:#667eea;
+  --orange1:#f59e0b;
+  --orange2:#d97706;
+  --text:#333;
+  --muted:#666;
+  --card:#fff;
+  --soft:#f9f9f9;
+}
+html, body, [data-testid="stAppViewContainer"]{ height:100%; }
+body, [data-testid="stAppViewContainer"]{
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%) !important;
+}
+.mz-container{
+  max-width: 1200px; margin: 0 auto;
+  background: white; border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  overflow: hidden;
+}
+.mz-header{
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+  color: white; padding: 30px; text-align: center;
+}
+.mz-header h1{ font-size: 28px; margin-bottom: 10px; }
+.mz-header p{ font-size: 14px; opacity: 0.9; }
+.mz-tabs{
+  display:flex; background:#f5f5f5;
+  border-bottom:2px solid #ddd;
+}
+.mz-tab{
+  flex:1; padding: 20px; text-align:center;
+  font-size:16px; font-weight:bold;
+  background:#f5f5f5; border:none;
+}
+.mz-tab.active{
+  background:white; color: var(--accent);
+  border-bottom:3px solid var(--accent);
+}
+.mz-section{
+  margin-bottom: 30px; padding: 20px;
+  background: var(--soft);
+  border-radius: 10px;
+  border-left: 4px solid var(--accent);
+}
+.mz-section h2{ color: var(--accent); margin-bottom: 15px; font-size: 20px; }
+.result-card{
+  background: white; border-radius: 15px;
+  padding: 25px; margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s;
+}
+.result-card:hover{ box-shadow: 0 8px 12px rgba(0,0,0,0.15); }
+.result-card.recommended{
+  border-color: var(--orange1);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+}
+.result-card h3{ color: var(--text); margin-bottom: 10px; font-size: 22px; }
+.badge{
+  display:inline-block;
+  background: linear-gradient(135deg, var(--orange1), var(--orange2));
+  color:white; padding: 5px 15px;
+  border-radius: 20px; font-size:14px;
+  margin-left:10px;
+}
+.result-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+.result-item{ padding: 15px; background: #f9f9f9; border-radius: 8px; }
+.result-item label{ display:block; color:#666; font-size:14px; margin-bottom: 5px; }
+.result-item .value{ display:block; color:#333; font-size:24px; font-weight:bold; }
+.result-item .value.orange{ color: var(--orange1); }
+.mz-table{ width:100%; border-collapse: collapse; margin-top: 20px; }
+.mz-table th, .mz-table td{ padding: 12px; text-align:left; border-bottom: 1px solid #ddd; }
+.mz-table th{ background:#f9f9f9; font-weight:bold; color: var(--accent); }
+.highlight-orange-header{
+  background: linear-gradient(135deg, var(--orange1), var(--orange2)) !important;
+  color: white !important;
+}
+.highlight-orange-cell{ background: #fef3c7 !important; font-weight:bold !important; }
+.lumpsum-detail{ margin-top: 20px; padding: 15px; background: #f0f4ff; border-radius: 10px; }
+.lumpsum-detail h4{ color: var(--accent); margin-bottom: 15px; }
+.lumpsum-item{
+  display:grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 10px;
+  padding: 10px;
+  background:white;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+.lumpsum-item.total{
+  background: #e0e7ff;
+  font-weight:bold;
+  margin-top: 10px;
+  border-top: 2px solid var(--accent);
+}
+.lumpsum-label{ font-weight:500; }
+.lumpsum-age{ color:#666; font-size:0.9em; }
+.lumpsum-amount,.lumpsum-tax,.lumpsum-net{ text-align:right; }
+.cashflow-summary{
+  background:#f9fafb;
+  border-radius:10px;
+  padding:20px;
+  margin-bottom:20px;
+}
+.cashflow-summary h4{ color: var(--accent); margin-bottom:15px; }
+.cashflow-section{ margin-bottom:20px; }
+.cashflow-section-title{
+  font-weight:bold;
+  color:#374151;
+  margin-bottom:10px;
+  padding-bottom:5px;
+  border-bottom:2px solid #e5e7eb;
+}
+.cashflow-line{
+  display:flex;
+  justify-content:space-between;
+  padding:8px 0;
+  border-bottom:1px solid #e5e7eb;
+}
+.cashflow-line.total{
+  font-weight:bold;
+  color:#1e40af;
+  border-top:2px solid #1e40af;
+  margin-top:10px;
+  padding-top:10px;
+}
+.block-container{ padding-top: 1.0rem !important; padding-bottom: 2.0rem !important; }
+[data-testid="stNumberInput"] input{ border-radius: 8px !important; border: 2px solid #ddd !important; }
+
+
+/* === 結果カード/グラフの見やすさ改善（指定箇所のみ） === */
+
+/* 結果ブロックをカードっぽく（添付②のイメージに寄せる） */
+.result{
+  margin-top: 12px !important;
+  padding: 22px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12) !important;
+}
+
+/* 通常カード */
+.result-item{
+  background: #fff !important;
+  border-radius: 14px !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10) !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+}
+
+/* ハイライトカード（大きいカード） */
+.result-item.highlight{
+  border-radius: 18px !important;
+  border: 3px solid var(--accent) !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,0.14) !important;
+}
+
+/* 値の視認性UP */
+.result-value{
+  letter-spacing: 0.3px;
+}
+
+/* グラフ枠（添付③のイメージに寄せる） */
+.chart-container{
+  margin-top: 18px !important;
+  background: #fff !important;
+  padding: 22px !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10) !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+}
+
+
+/* === 結果カードの高さ統一（指定箇所のみ） === */
+/* 結果の箱サイズ（高さ）を揃えて見やすくする */
+.result-item,
+.result-item.highlight{
+  width: 100% !important;
+  min-height: 120px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 6px;
+}
+
+/* ハイライトは文字が大きいので少し余裕 */
+.result-item.highlight{
+  min-height: 140px !important;
+}
+
+
+/* === 配色/外枠/ボタン/結果文字の改善（指定箇所のみ） === */
+
+/* 背景グラデーション：青〜紺の中間（奥の背景） */
+:root{
+  --bg1:#2f5fd0;   /* 青寄り */
+  --bg2:#1f2d5c;   /* 紺寄り */
+  --accent:#2f5fd0;
+}
+
+/* 白い外枠パネル（背景の上に大きい白パネルを載せる） */
+.block-container{
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  background: #ffffff !important;
+  border-radius: 22px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.28) !important;
+  padding: 28px 28px 36px 28px !important;
+}
+
+/* Streamlitの上部バー等は透明化して背景を邪魔しない */
+[data-testid="stHeader"],
+[data-testid="stToolbar"],
+[data-testid="stDecoration"]{
+  background: transparent !important;
+}
+
+/* 「計算する」ボタン：赤ではなく青〜紺の中間色に統一 */
+button[kind="primary"]{
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%) !important;
+  color: #fff !important;
+  border: none !important;
+}
+button[kind="primary"]:hover{
+  filter: brightness(1.05);
+}
+
+/* 計算結果（カード内）の文字を見やすく */
+.result-label{
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #1f2d5c !important;
+  margin-bottom: 8px !important;
+}
+.result-value{
+  font-size: 34px !important;
+  font-weight: 800 !important;
+  color: #111827 !important;
+  line-height: 1.15 !important;
+}
+
+/* 小さめカードの値も読みやすく */
+.result-item:not(.highlight) .result-value{
+  font-size: 26px !important;
+  font-weight: 800 !important;
+}
+
+
+/* === ①②③ 切替タブ＆引き継ぎボタンの“ボタン感”改善（指定箇所のみ） === */
+
+/* app.py側で <div class="mz-tabbar"> でラップした st.radio をタブ風ボタンに */
+.mz-tabbar [role="radiogroup"]{
+  display: flex !important;
+  gap: 12px !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 10px 0 6px 0 !important;
+}
+
+/* 各タブ（BaseWebのRadioをボタン風に見せる） */
+.mz-tabbar [role="radio"]{
+  border-radius: 14px !important;
+  padding: 12px 18px !important;
+  border: 2px solid rgba(255,255,255,0.55) !important;
+  background: rgba(255,255,255,0.14) !important;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10) !important;
+  transition: all 160ms ease !important;
+}
+
+/* ラベル文字 */
+.mz-tabbar [role="radio"] *{
+  font-weight: 800 !important;
+  font-size: 15px !important;
+}
+
+/* 未選択時：文字は白寄り */
+.mz-tabbar [role="radio"][aria-checked="false"]{
+  color: rgba(255,255,255,0.92) !important;
+}
+
+/* 選択時：白ボタン＋アクセント色 */
+.mz-tabbar [role="radio"][aria-checked="true"]{
+  background: #ffffff !important;
+  color: var(--accent) !important;
+  border-color: rgba(255,255,255,0.9) !important;
+  box-shadow: 0 16px 34px rgba(0,0,0,0.14) !important;
+  transform: translateY(-1px);
+}
+
+/* ホバー */
+.mz-tabbar [role="radio"]:hover{
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+/* Radioの丸いマークは非表示（ボタンっぽくする） */
+.mz-tabbar [role="radio"] svg{
+  display: none !important;
+}
+
+/* ③の「引き継ぐ」ボタン：primaryを“押せる感”強めに（色は既存primaryグラデを使用） */
+button[kind="primary"]{
+  border-radius: 14px !important;
+  padding: 14px 18px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 14px 32px rgba(0,0,0,0.18) !important;
+}
+button[kind="primary"]:active{
+  transform: translateY(1px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.16) !important;
+}
+
+
+/* === タブを3分割＆ボタン同形状に（指定箇所のみ） === */
+
+/* 3分割（均等幅） */
+.mz-tabbar [role="radiogroup"]{
+  width: 100% !important;
+  max-width: 760px !important;
+}
+
+/* 各タブを均等に伸ばす */
+.mz-tabbar [role="radio"]{
+  flex: 1 1 0 !important;
+  justify-content: center !important;
+  text-align: center !important;
+  border-radius: 14px !important;          /* ボタンと同形状 */
+  padding: 14px 16px !important;           /* ボタンと同等の厚み */
+}
+
+/* 未選択：白背景＋黒文字（背景あり） */
+.mz-tabbar [role="radio"][aria-checked="false"]{
+  background: #ffffff !important;
+  color: #111827 !important;
+  border: 2px solid rgba(17,24,39,0.08) !important;
+}
+
+/* 選択中：引き継ぎボタンと同色（primaryと同じ青〜紺グラデ）＋白文字 */
+.mz-tabbar [role="radio"][aria-checked="true"]{
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* タブ内の文字も中央寄せ */
+.mz-tabbar [role="radio"] *{
+  width: 100%;
+  text-align: center !important;
+}
+
+
+/* === st.radio タブを data-testid で確実にボタン化（指定箇所のみ） === */
+/* これまでの [role="radio"] 系がDOMに当たらない場合があるため、Streamlitの data-testid を使用 */
+
+/* radiogroup を横並び＆3分割 */
+.mz-tabbar div[data-testid="stRadio"] > div[role="radiogroup"],
+.mz-tabbar div[data-testid="stRadio"] div[role="radiogroup"]{
+  display: flex !important;
+  gap: 12px !important;
+  justify-content: center !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 760px !important;
+  margin: 0 auto !important;
+}
+
+/* 各選択肢（label）を均等幅の“ボタン”に */
+.mz-tabbar div[data-testid="stRadio"] label{
+  flex: 1 1 0 !important;
+  margin: 0 !important;
+  cursor: pointer !important;
+}
+
+/* 既定のラジオ丸（input/アイコン）を隠す */
+.mz-tabbar div[data-testid="stRadio"] input[type="radio"]{
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* label 内の「中身」をボタン化（構造差分に備えて複数パターンを網羅） */
+.mz-tabbar div[data-testid="stRadio"] label > div,
+.mz-tabbar div[data-testid="stRadio"] label > span,
+.mz-tabbar div[data-testid="stRadio"] label div[role="radio"],
+.mz-tabbar div[data-testid="stRadio"] label div{
+  width: 100% !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  text-align: center !important;
+  font-weight: 800 !important;
+  font-size: 15px !important;
+  box-shadow: 0 14px 32px rgba(0,0,0,0.12) !important;
+  transition: all 160ms ease !important;
+  border: 2px solid rgba(17,24,39,0.08) !important;
+  background: #ffffff !important;       /* 非選択：白背景 */
+  color: #111827 !important;            /* 非選択：黒文字 */
+}
+
+/* 選択中：primaryボタンと同色（青〜紺グラデ）＋白文字
+   - input:checked + (div/span) パターン
+   - aria-checked="true" パターン
+*/
+.mz-tabbar div[data-testid="stRadio"] input[type="radio"]:checked + div,
+.mz-tabbar div[data-testid="stRadio"] input[type="radio"]:checked + span,
+.mz-tabbar div[data-testid="stRadio"] label div[aria-checked="true"],
+.mz-tabbar div[data-testid="stRadio"] label div[role="radio"][aria-checked="true"]{
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 16px 34px rgba(0,0,0,0.16) !important;
+  transform: translateY(-1px);
+}
+
+/* ホバー */
+.mz-tabbar div[data-testid="stRadio"] label:hover > div,
+.mz-tabbar div[data-testid="stRadio"] label:hover > span,
+.mz-tabbar div[data-testid="stRadio"] label:hover div{
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+
+/* === タブ文字が消える問題の修正（role=radio をボタン本体にする） === */
+/* Streamlitのラジオは label > div[role="radio"] にテキストが入る構造が多い。
+   ここをボタン本体として整形し、外枠いっぱい（幅100%）に広げる。 */
+
+/* タブ全体は白枠の幅いっぱい使う */
+div[data-testid="stRadio"] div[role="radiogroup"]{
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 auto 10px auto !important;
+}
+
+/* 3分割（均等） */
+div[data-testid="stRadio"] div[role="radiogroup"] > label{
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+/* ボタン本体（ここに文字がある） */
+div[data-testid="stRadio"] div[role="radiogroup"] > label div[role="radio"]{
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 14px 16px !important;
+  border-radius: 14px !important;
+  border: 2px solid rgba(17,24,39,0.08) !important;
+  background: #ffffff !important;       /* 非選択：白 */
+  color: #111827 !important;            /* 非選択：黒 */
+  box-shadow: 0 14px 32px rgba(0,0,0,0.12) !important;
+  transition: all 160ms ease !important;
+  text-align: center !important;
+}
+
+/* 文字は2行まで許可（はみ出し防止） */
+div[data-testid="stRadio"] div[role="radiogroup"] > label div[role="radio"] *{
+  white-space: normal !important;
+  word-break: keep-all !important;
+  line-height: 1.2 !important;
+  font-weight: 800 !important;
+  font-size: 15px !important;
+  max-width: 100% !important;
+}
+
+/* ラジオの丸いアイコンは非表示 */
+div[data-testid="stRadio"] div[role="radiogroup"] svg{
+  display: none !important;
+}
+
+/* 選択中：青〜紺グラデ＋白文字（aria-checkedで拾う） */
+div[data-testid="stRadio"] div[role="radiogroup"] > label div[role="radio"][aria-checked="true"]{
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 16px 34px rgba(0,0,0,0.16) !important;
+  transform: translateY(-1px);
+}
+div[data-testid="stRadio"] div[role="radiogroup"] > label div[role="radio"][aria-checked="true"] *{
+  color: #ffffff !important;
+}
+
+/* ホバー */
+div[data-testid="stRadio"] div[role="radiogroup"] > label div[role="radio"]:hover{
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+
+/* === 最終FIX: Streamlit(BaseWeb)のRadio DOMに合わせてタブを確実にボタン化（指定箇所のみ） ===
+   症状: ○アイコン付きの標準表示に戻る / CSSが当たっていても丸が消えない
+   原因: StreamlitのRadioは data-baseweb="radio" 構造で、div[role="radio"] や svg が無い場合がある
+   対策: data-testid="stRadio" + data-baseweb="radio" を基準にスタイルする
+*/
+
+/* 3分割・横並び（外枠いっぱい使う） */
+div[data-testid="stRadio"] div[role="radiogroup"]{
+  display: flex !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 auto 10px auto !important;
+}
+
+/* 各選択肢を等幅に */
+div[data-testid="stRadio"] div[role="radiogroup"] > label{
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+/* BaseWebのradio本体を“ボタン”に */
+div[data-testid="stRadio"] div[role="radiogroup"] div[data-baseweb="radio"]{
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 14px 16px !important;
+  border-radius: 14px !important;
+  border: 2px solid rgba(17,24,39,0.08) !important;
+  background: #ffffff !important;   /* 非選択：白 */
+  color: #111827 !important;        /* 非選択：黒 */
+  box-shadow: 0 14px 32px rgba(0,0,0,0.12) !important;
+  transition: all 160ms ease !important;
+}
+
+/* 左の丸アイコン（radioマーク）を消す */
+div[data-testid="stRadio"] div[role="radiogroup"] div[data-baseweb="radio"] > div:first-child{
+  display: none !important;
+}
+
+/* ラベル文字（2行までOK） */
+div[data-testid="stRadio"] div[role="radiogroup"] div[data-baseweb="radio"] > div:last-child,
+div[data-testid="stRadio"] div[role="radiogroup"] div[data-baseweb="radio"] span{
+  font-weight: 800 !important;
+  font-size: 15px !important;
+  line-height: 1.2 !important;
+  white-space: normal !important;
+  text-align: center !important;
+  color: inherit !important;
+}
+
+/* 選択中（checked）: input:checked を拾って親のradioを塗る */
+div[data-testid="stRadio"] div[role="radiogroup"] input[type="radio"]:checked
+  + div[data-baseweb="radio"]{
+  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 16px 34px rgba(0,0,0,0.16) !important;
+  transform: translateY(-1px);
+}
+
+/* hover */
+div[data-testid="stRadio"] div[role="radiogroup"] div[data-baseweb="radio"]:hover{
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   【最終確定】st.radio タブをボタン化（DOM確定版・競合完全回避）
+   既存CSSは削除せず、最後にこれだけを追加する
+   ========================================================= */
+
+/* 横並び・3分割・外枠いっぱい */
+div[data-testid="stRadio"] > div[role="radiogroup"]{
+  display: flex !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+/* 各タブを等幅 */
+div[data-testid="stRadio"] > div[role="radiogroup"] > label{
+  flex: 1 1 0 !important;
+  margin: 0 !important;
+}
+
+/* 左の○（最初のdiv）を完全に消す */
+div[data-testid="stRadio"] > div[role="radiogroup"] > label > div:first-child{
+  display: none !important;
+}
+
+/* ボタン本体（input直後のdiv：ここに文字がある） */
+div[data-testid="stRadio"] > div[role="radiogroup"]
+  > label > input + div{
+  width: 100% !important;
+  padding: 16px 18px !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;   /* 非選択 */
+  color: #111827 !important;
+  border: 2px solid rgba(17,24,39,0.12) !important;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.12) !important;
+  text-align: center !important;
+  font-weight: 800 !important;
+  transition: all 0.15s ease !important;
+}
+
+/* 選択中（checked） */
+div[data-testid="stRadio"] > div[role="radiogroup"]
+  > label > input:checked + div{
+  background: linear-gradient(135deg, var(--bg1), var(--bg2)) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 16px 36px rgba(0,0,0,0.18) !important;
+  transform: translateY(-1px);
+}
+
+/* 文字（pタグ） */
+div[data-testid="stRadio"] p{
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* hover */
+div[data-testid="stRadio"] > div[role="radiogroup"]
+  > label > input + div:hover{
+  filter: brightness(1.05);
+}
+
+/* === レスポンシブ（iPhone縦向き最適化）=== */
+@media (max-width: 480px) {
+  /* 1) ①②③タブ：1行1ボタン（縦積み） */
+  div[data-testid="stRadio"] > div[role="radiogroup"]{
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  div[data-testid="stRadio"] > div[role="radiogroup"] > label{
+    width: 100% !important;
+  }
+  div[data-testid="stRadio"] > div[role="radiogroup"] > label > input + div{
+    width: 100% !important;
+    padding: 14px 16px !important;
+  }
+  div[data-testid="stRadio"] > div[role="radiogroup"] > label > input:checked + div{
+    transform: none !important; /* 縦並びでは浮かせない */
+  }
+  /* タブ文字は折り返しOK（枠から出さない） */
+  div[data-testid="stRadio"] p{
+    white-space: normal !important;
+    word-break: keep-all !important;
+  }
+
+  /* 2) タイトル/サブタイトル：小さく（入力欄相当）＋太字で強調 */
+  h1, h2{
+    font-size: 1rem !important; /* 入力欄近いサイズ */
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+  }
+  /* Streamlit既定の見出しクラスにも保険 */
+  .stMarkdown h1, .stMarkdown h2{
+    font-size: 1rem !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+  }
+
+  /* 3) 結果カード：1カード1行に（横並び解除） */
+  .results-grid{
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .result-card{
+    width: 100% !important;
+  }
+  /* 結果カード内の主要数値：入力より1段大きい＋太字 */
+  .result-card .value,
+  .result-card .mz-value,
+  .result-card strong{
+    font-size: 1.1rem !important;
+    font-weight: 800 !important;
+  }
+  .result-card .label,
+  .result-card .mz-label{
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+  }
+/* === iPhone縦：結果カードを強制的に1列化（inline styleのgrid列指定を上書き） === */
+@media (max-width: 480px) {
+
+  /* 結果全体：横幅いっぱい */
+  .result{
+    width: 100% !important;
+  }
+
+  /* inline style で grid-template-columns を指定している“子グリッド”を1列に潰す */
+  .result [style*="grid-template-columns"]{
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 余白は少し詰める（任意） */
+  .result [style*="display: grid"]{
+    gap: 12px !important;
+  }
+
+  /* カード1枚を横いっぱいに */
+  .result-item{
+    width: 100% !important;
+  }
+
+  /* 文字：見やすく（入力欄より1段大きめ＋太字） */
+  .result-item .result-value{
+    font-size: 1.1rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+  }
+  .result-item .result-label{
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+  }
+
+}
